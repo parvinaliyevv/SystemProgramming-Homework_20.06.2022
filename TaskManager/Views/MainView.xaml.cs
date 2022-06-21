@@ -8,4 +8,9 @@ public partial class MainView : Window
 
         DataContext = new MainViewModel();
     }
+
+    private void Windows_Loaded(object sender, RoutedEventArgs e)
+    {
+        Icon = ImageService.GetImageFromByteArray(TaskManager.Resources.Images.Icon);
+    }
 }

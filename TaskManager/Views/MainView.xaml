@@ -4,26 +4,54 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Title="Task Manager" MinHeight="600" MinWidth="900" mc:Ignorable="d">
+        Title="Task Manager" MinHeight="600" MinWidth="900" Loaded="Windows_Loaded" mc:Ignorable="d">
 
     <Window.Resources>
 
-        <SolidColorBrush x:Key="ApplicationColor" Color="Firebrick"/>
+        <SolidColorBrush x:Key="ApplicationColor" Color="#F55353"/>
 
-        <Style x:Key="ApplicationButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatAccentBgButton}">
+        <Style x:Key="ApplicationStandartButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedSecondaryDarkButton}">
 
             <Setter Property="Background" Value="{StaticResource ApplicationColor}"/>
+            <Setter Property="Foreground" Value="GhostWhite"/>
+
             <Setter Property="BorderBrush" Value="{StaticResource ApplicationColor}"/>
+            
+            <Setter Property="materialDesign:RippleAssist.Feedback" Value="{StaticResource ApplicationColor}"/>
 
         </Style>
 
+        <Style x:Key="ApplicationOptionButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedAccentButton}">
+
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="Black"/>
+            
+            <Setter Property="BorderBrush" Value="{StaticResource ApplicationColor}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+
+        </Style>
+
+        <Style x:Key="ApplicationStandartTextBox" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBoxBase}">
+
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="Black"/>
+            
+            <Setter Property="FontFamily" Value="Calibri"/>
+            <Setter Property="FontSize" Value="16"/>
+            
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+
+            <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource ApplicationColor}"/>
+
+        </Style>
+        
     </Window.Resources>
     
     <materialDesign:DialogHost DialogTheme="Light">
 
         <materialDesign:DialogHost.DialogContent>
 
-            <Grid Height="230" Width="300" Margin="20, 10">
+            <Grid Height="200" Width="300" Margin="20, 10">
 
                 <Grid.RowDefinitions>
                     <RowDefinition MaxHeight="35"/>
@@ -31,9 +59,7 @@
                 </Grid.RowDefinitions>
 
                 <DockPanel LastChildFill="False">
-                    <Button Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" DockPanel.Dock="Right">
-                        <materialDesign:PackIcon Kind="Close"/>
-                    </Button>
+                    <Button Style="{StaticResource ApplicationOptionButton}" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" Content="{materialDesign:PackIcon Kind=Close}" DockPanel.Dock="Right"/>
                 </DockPanel>
 
                 <Grid Margin="10, 5, 10, 20" Grid.Row="1">
@@ -46,10 +72,14 @@
 
                     <TextBlock Text="New Process" FontFamily="Arial Bold" FontSize="24"/>
 
-                    <TextBox Text="{Binding ProcessTitleValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Title" Grid.Row="1"/>
+                    <UniformGrid Rows="1" Grid.Row="1">
 
-                    <DockPanel VerticalAlignment="Bottom" LastChildFill="False" Grid.Row="2">
-                        <Button Command="{Binding CreateProcessCommand}" Content="Create" DockPanel.Dock="Right"/>
+                        <TextBox Style="{StaticResource ApplicationStandartTextBox}" Text="{Binding ProcessTitleValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Title"/>
+
+                    </UniformGrid>
+
+                    <DockPanel LastChildFill="False" VerticalAlignment="Bottom" Grid.Row="2">
+                        <Button Style="{StaticResource ApplicationStandartButton}" Command="{Binding CreateProcessCommand}" Content="Create" DockPanel.Dock="Right"/>
                     </DockPanel>
 
                 </Grid>
@@ -61,32 +91,59 @@
         <Grid Margin="15">
 
             <Grid.RowDefinitions>
+                <RowDefinition MaxHeight="30"/>
                 <RowDefinition/>
-                <RowDefinition MaxHeight="100"/>
+                <RowDefinition MaxHeight="70"/>
             </Grid.RowDefinitions>
 
-            <ListView ItemsSource="{Binding Processes}" SelectedItem="{Binding SelectedProcess}">
+            <Grid Margin="0, 0, 40, 0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Border x:Name="ColumnWidth" Grid.Row="0"/>
+
+            </Grid>
+
+            <DockPanel LastChildFill="False">
+
+                <StackPanel Orientation="Horizontal" Margin="20, 0" DockPanel.Dock="Right">
+
+                    <TextBox Style="{StaticResource ApplicationStandartTextBox}" Text="{Binding SearchProcessValue, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Search" Width="200"/>
+
+                    <Button Style="{StaticResource ApplicationStandartButton}" Command="{Binding SearchProcessCommand}" Margin="5, 0" Content="{materialDesign:PackIcon Kind=Search}"/>
+
+                </StackPanel>
+
+            </DockPanel>
+
+            <ListView SelectionMode="Single" ItemsSource="{Binding Processes}" SelectedItem="{Binding SelectedProcess}" Grid.Row="1">
 
                 <ListView.View>
                     <GridView>
 
-                        <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}"/>
-                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding ProcessName}"/>
-                        <GridViewColumn Header="Handle Count" DisplayMemberBinding="{Binding HandleCount}"/>
-                        <GridViewColumn Header="Thread Count" DisplayMemberBinding="{Binding Threads.Count}"/>
-                        <GridViewColumn Header="Machine Name" DisplayMemberBinding="{Binding MachineName}"/>
-
+                        <GridViewColumn Width="{Binding ElementName=ColumnWidth, Path=ActualWidth}" Header="Id" DisplayMemberBinding="{Binding Id}"/>
+                        <GridViewColumn Width="{Binding ElementName=ColumnWidth, Path=ActualWidth}" Header="Name" DisplayMemberBinding="{Binding ProcessName}"/>
+                        <GridViewColumn Width="{Binding ElementName=ColumnWidth, Path=ActualWidth}" Header="Handle Count" DisplayMemberBinding="{Binding HandleCount}"/>
+                        <GridViewColumn Width="{Binding ElementName=ColumnWidth, Path=ActualWidth}" Header="Thread Count" DisplayMemberBinding="{Binding Threads.Count}"/>
+                        <GridViewColumn Width="{Binding ElementName=ColumnWidth, Path=ActualWidth}" Header="Machine Name" DisplayMemberBinding="{Binding MachineName}"/>
+                        
                     </GridView>
                 </ListView.View>
                 
             </ListView>
 
-            <DockPanel LastChildFill="False" Grid.Row="1">
+            <DockPanel LastChildFill="False" Grid.Row="2">
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
 
-                    <Button Style="{StaticResource ApplicationButton}" Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}" Margin="5" Content="Create process"/>
-                    <Button Style="{StaticResource ApplicationButton}" Command="{Binding EndProcessCommand}" Margin="5" Content="End process"/>
+                    <Button Style="{StaticResource ApplicationStandartButton}" Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}" Width="130" Margin="5" Content="Create process"/>
+                    <Button Style="{StaticResource ApplicationStandartButton}" Command="{Binding EndProcessCommand}" Width="130" Margin="5" Content="End process"/>
 
                 </StackPanel>
 
